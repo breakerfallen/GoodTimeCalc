@@ -16,13 +16,17 @@ the sentencing date, and the sentence. One screen produces:
 
 - **PSCC as of the sentencing date** — day of arrest through day of release or
   sentencing, counted inclusively (C.R.S. 18-1.3-405; *People v. Fransua*),
-  plus a field for additional custody days from other periods.
+  plus a field for additional custody days from other periods. The total can
+  also be entered directly (e.g., off the mittimus) instead of computed from dates.
 - **DOC (prison) sentences** (C.R.S. 17-22.5-403, -405):
   - Parole eligibility date with **no earned time** and with **full earned time**
   - Mandatory release date (MRD) with full earned time
   - Sentence discharge date with no earned time
-  - Earned time at 10 days/month (standard) or 12 days/month (F4–F6, DF3–DF4),
-    capped at 30% of the sentence
+  - Earned time at 10 days/month (standard), 14 days/month for F4–F6 and
+    DF3–DF4 under SB26-159 (2026), or 12 days/month for SB26-159's excluded
+    offenses (felony motor vehicle theft; C.R.S. 18-3-303, -305, -306;
+    18-6-701; 18-7-402 to -407; 18-12-102; 18-12-109; felony victim-rights
+    crimes in 24-4.1-302) — all capped at 30% of the sentence
   - Parole eligibility rules: 50% less earned time (most felonies); 75% less
     earned time (listed crimes of violence committed 7/1/2004–12/31/2024);
     85% with no earned-time reduction (Proposition 128, listed crimes of violence

@@ -32,27 +32,43 @@
 
       <section class="card">
         <h2>Custody &amp; sentencing</h2>
-        <label for="arrest-date">Date of arrest / custody start</label>
-        <input type="date" id="arrest-date" required>
-
-        <fieldset class="segmented" id="custody-end">
-          <legend>Custody status before sentencing</legend>
-          <label><input type="radio" name="custodyEnd" value="sentencing" checked>
-            <span>In custody through sentencing</span></label>
-          <label><input type="radio" name="custodyEnd" value="bond">
-            <span>Bonded out</span></label>
+        <fieldset class="segmented" id="pscc-mode">
+          <legend>Presentence confinement credit</legend>
+          <label><input type="radio" name="psccMode" value="dates" checked>
+            <span>Calculate from dates</span></label>
+          <label><input type="radio" name="psccMode" value="manual">
+            <span>Enter days directly</span></label>
         </fieldset>
 
-        <div id="bond-row" hidden>
-          <label for="bond-date">Bond-out date</label>
-          <input type="date" id="bond-date">
+        <div id="pscc-dates">
+          <label for="arrest-date">Date of arrest / custody start</label>
+          <input type="date" id="arrest-date">
+
+          <fieldset class="segmented" id="custody-end">
+            <legend>Custody status before sentencing</legend>
+            <label><input type="radio" name="custodyEnd" value="sentencing" checked>
+              <span>In custody through sentencing</span></label>
+            <label><input type="radio" name="custodyEnd" value="bond">
+              <span>Bonded out</span></label>
+          </fieldset>
+
+          <div id="bond-row" hidden>
+            <label for="bond-date">Bond-out date</label>
+            <input type="date" id="bond-date">
+          </div>
+
+          <label for="extra-pscc">Additional PSCC days (other custody periods)</label>
+          <input type="number" id="extra-pscc" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+
+        <div id="pscc-manual" hidden>
+          <label for="pscc-days">PSCC days as of sentencing</label>
+          <input type="number" id="pscc-days" min="0" step="1" inputmode="numeric"
+                 placeholder="e.g., 182">
         </div>
 
         <label for="sentencing-date">Sentencing date</label>
         <input type="date" id="sentencing-date" required>
-
-        <label for="extra-pscc">Additional PSCC days (other custody periods)</label>
-        <input type="number" id="extra-pscc" min="0" step="1" value="0" inputmode="numeric">
       </section>
 
       <section class="card">
@@ -76,10 +92,17 @@
           <fieldset class="segmented">
             <legend>Earned time rate (C.R.S. 17-22.5-405)</legend>
             <label><input type="radio" name="etRate" value="10" checked>
-              <span>10 days/mo (standard)</span></label>
+              <span>10/mo — standard</span></label>
+            <label><input type="radio" name="etRate" value="14">
+              <span>14/mo — F4–F6, DF3–DF4 (SB26-159)</span></label>
             <label><input type="radio" name="etRate" value="12">
-              <span>12 days/mo (F4–F6, DF3–DF4)</span></label>
+              <span>12/mo — SB26-159 excluded offense</span></label>
           </fieldset>
+          <p class="muted help" id="sb26-note">SB26-159 (2026) raises earned time for class 4–6
+            felonies and level 3–4 drug felonies from 12 to 14 days/month, <strong>except</strong>
+            felony motor vehicle theft; C.R.S. 18-3-303, 18-3-305, 18-3-306; 18-6-701;
+            18-7-402 to 18-7-407; 18-12-102; 18-12-109; and felony victim-rights crimes listed
+            in 24-4.1-302 — those stay at 12.</p>
 
           <label for="parole-pct">Parole eligibility (C.R.S. 17-22.5-403)</label>
           <select id="parole-pct">

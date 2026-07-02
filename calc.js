@@ -79,8 +79,29 @@ var GTC = (function () {
   /*
    * PSCC: inclusive of the day of arrest and the day of release
    * (bond-out) or the day of sentencing when held through sentencing.
+   * Alternatively the total may be entered directly (psccMode 'manual'),
+   * e.g. when the credit is already computed on the mittimus.
    */
   function computePscc(input) {
+    if (input.psccMode === 'manual') {
+      var sentencingM = parseDate(input.sentencingDate);
+      if (sentencingM === null) return { errors: ['Enter a valid sentencing date.'] };
+      var raw = input.psccManualDays;
+      if (raw === '' || raw === null || raw === undefined) {
+        return { errors: ['Enter the PSCC days (0 or more).'] };
+      }
+      var manual = Math.floor(+raw);
+      if (!(manual >= 0)) return { errors: ['Enter the PSCC days (0 or more).'] };
+      return {
+        errors: [],
+        manual: true,
+        sentencingMs: sentencingM,
+        baseDays: manual,
+        extraDays: 0,
+        totalDays: manual
+      };
+    }
+
     var arrest = parseDate(input.arrestDate);
     var sentencing = parseDate(input.sentencingDate);
     var extra = Math.max(0, Math.floor(+input.extraPsccDays || 0));
@@ -135,7 +156,7 @@ var GTC = (function () {
     var S = daysBetween(start, sdd);
     if (S <= 0) return { errors: ['Sentence length must be greater than zero.'] };
 
-    var r = opts.etRate === 12 ? 12 : 10;
+    var r = [10, 12, 14].indexOf(opts.etRate) >= 0 ? opts.etRate : 10;
     var etCap = Math.floor(0.30 * S);
     var etFull = Math.min(Math.floor(S * r / (30 + r)), etCap);
     var mrdFull = addDays(start, S - etFull);
@@ -212,6 +233,18 @@ var GTC = (function () {
     };
   }
 
+  var ET_LABELS = {
+    10: '10 days/month (standard)',
+    12: '12 days/month (F4–F6, DF3–DF4 — SB26-159 excluded offense)',
+    14: '14 days/month (F4–F6, DF3–DF4 — SB26-159)'
+  };
+
+  // Offenses excluded from SB26-159's 14-day rate (remain at 12 days/month)
+  var SB26_159_NOTE = 'SB26-159 (2026) raises earned time for class 4–6 felonies and ' +
+    'level 3–4 drug felonies from 12 to 14 days/month, except felony motor vehicle theft; ' +
+    'C.R.S. 18-3-303, 18-3-305, 18-3-306; 18-6-701; 18-7-402 to 18-7-407; 18-12-102; ' +
+    '18-12-109; and felony victim-rights crimes listed in 24-4.1-302, which stay at 12.';
+
   var PAROLE_LABELS = {
     50: '50% less earned time (most felonies)',
     75: '75% less earned time (listed violent crimes 7/1/2004–12/31/2024)',
@@ -241,7 +274,7 @@ var GTC = (function () {
         sentencingMs: pscc.sentencingMs,
         psccDays: pscc.totalDays,
         term: term,
-        etRate: +input.etRate === 12 ? 12 : 10,
+        etRate: +input.etRate,
         parolePct: +input.parolePct || 50
       });
       if (result.doc.errors && result.doc.errors.length) return { errors: result.doc.errors };
@@ -259,15 +292,20 @@ var GTC = (function () {
     L.push('GoodTimeCalc — ' + (input.title || 'Untitled calculation'));
     if (input.notes) L.push('Notes: ' + input.notes);
     L.push('');
-    L.push('Arrest date: ' + fmtShort(p.arrestMs));
-    if (input.custodyEnd === 'bond') {
-      L.push('Bonded out: ' + fmtShort(p.endMs));
+    if (p.manual) {
+      L.push('Sentencing date: ' + fmtShort(p.sentencingMs));
+      L.push('PSCC as of sentencing: ' + p.totalDays + ' days (entered directly)');
     } else {
-      L.push('In custody through sentencing');
+      L.push('Arrest date: ' + fmtShort(p.arrestMs));
+      if (input.custodyEnd === 'bond') {
+        L.push('Bonded out: ' + fmtShort(p.endMs));
+      } else {
+        L.push('In custody through sentencing');
+      }
+      L.push('Sentencing date: ' + fmtShort(p.sentencingMs));
+      if (p.extraDays) L.push('Additional PSCC days: ' + p.extraDays);
+      L.push('PSCC as of sentencing: ' + p.totalDays + ' days');
     }
-    L.push('Sentencing date: ' + fmtShort(p.sentencingMs));
-    if (p.extraDays) L.push('Additional PSCC days: ' + p.extraDays);
-    L.push('PSCC as of sentencing: ' + p.totalDays + ' days');
     L.push('');
 
     if (result.type === 'jail') {
@@ -283,6 +321,7 @@ var GTC = (function () {
     } else {
       var d = result.doc;
       L.push('Sentence: ' + termToString(result.term) + ' DOC (' + d.sentenceDays + ' days)');
+      L.push('Earned time: ' + ET_LABELS[d.etRate]);
       L.push('Parole eligibility rule: ' + PAROLE_LABELS[d.parolePct]);
       L.push('');
       L.push('Estimated dates (PSCC already applied):');
@@ -324,6 +363,8 @@ var GTC = (function () {
     calculate: calculate,
     buildExportText: buildExportText,
     PAROLE_LABELS: PAROLE_LABELS,
+    ET_LABELS: ET_LABELS,
+    SB26_159_NOTE: SB26_159_NOTE,
     JAIL_SCENARIOS: JAIL_SCENARIOS,
     DISCLAIMER: DISCLAIMER
   };

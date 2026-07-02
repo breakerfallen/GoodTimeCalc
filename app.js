@@ -24,6 +24,8 @@
     return {
       title: $('title').value.trim(),
       notes: $('notes').value.trim(),
+      psccMode: radioValue('psccMode'),
+      psccManualDays: $('pscc-days').value,
       arrestDate: $('arrest-date').value,
       custodyEnd: radioValue('custodyEnd'),
       bondDate: $('bond-date').value,
@@ -41,6 +43,8 @@
   function writeInput(input) {
     $('title').value = input.title || '';
     $('notes').value = input.notes || '';
+    setRadio('psccMode', input.psccMode || 'dates');
+    $('pscc-days').value = input.psccManualDays || '';
     $('arrest-date').value = input.arrestDate || '';
     setRadio('custodyEnd', input.custodyEnd || 'sentencing');
     $('bond-date').value = input.bondDate || '';
@@ -56,6 +60,9 @@
   }
 
   function syncVisibility() {
+    var manualPscc = radioValue('psccMode') === 'manual';
+    $('pscc-dates').hidden = manualPscc;
+    $('pscc-manual').hidden = !manualPscc;
     $('bond-row').hidden = radioValue('custodyEnd') !== 'bond';
     $('doc-options').hidden = radioValue('type') !== 'doc';
   }
@@ -78,8 +85,10 @@
     var html = '<dl>';
     html += row('PSCC as of sentencing (' + GTC.fmtShort(p.sentencingMs) + ')',
       p.totalDays + ' days',
-      p.extraDays ? p.baseDays + ' counted + ' + p.extraDays + ' additional' : 'day of arrest through ' +
-        (input.custodyEnd === 'bond' ? 'bond-out' : 'sentencing') + ', inclusive',
+      p.manual ? 'entered directly' :
+        (p.extraDays ? p.baseDays + ' counted + ' + p.extraDays + ' additional' :
+          'day of arrest through ' +
+          (input.custodyEnd === 'bond' ? 'bond-out' : 'sentencing') + ', inclusive'),
       'hero');
     html += row('Sentence', GTC.termToString(result.term) +
       (result.type === 'jail' ? ' county jail' : ' DOC'),
@@ -225,9 +234,10 @@
     $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  document.querySelectorAll('input[name="custodyEnd"], input[name="type"]').forEach(function (el) {
-    el.addEventListener('change', syncVisibility);
-  });
+  document.querySelectorAll('input[name="custodyEnd"], input[name="type"], input[name="psccMode"]')
+    .forEach(function (el) {
+      el.addEventListener('change', syncVisibility);
+    });
 
   $('copy-btn').addEventListener('click', function () {
     if (lastExportText) copyText(lastExportText, this);

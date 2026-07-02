@@ -138,6 +138,7 @@ button.copied { background: var(--good); color: #fff; border-color: var(--good);
 }
 
 .disclaimer { font-size: 0.78rem; color: var(--muted); margin: 12px 0 0; }
+.help { font-size: 0.78rem; margin: 8px 0 0; }
 .muted { color: var(--muted); font-size: 0.88rem; }
 
 .history { list-style: none; margin: 0; padding: 0; }

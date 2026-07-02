@@ -40,6 +40,25 @@ var pErr = GTC.computePscc({
 });
 eq(pErr.errors.length > 0, true, 'pscc rejects arrest after sentencing');
 
+/* --- Manual PSCC entry --- */
+
+var pm = GTC.computePscc({
+  psccMode: 'manual', psccManualDays: '182', sentencingDate: '2026-07-01'
+});
+eq(pm.errors.length, 0, 'manual pscc: no errors');
+eq(pm.totalDays, 182, 'manual pscc uses entered days');
+eq(pm.manual, true, 'manual pscc flagged');
+
+var pmZero = GTC.computePscc({
+  psccMode: 'manual', psccManualDays: '0', sentencingDate: '2026-07-01'
+});
+eq(pmZero.totalDays, 0, 'manual pscc accepts zero');
+
+var pmBad = GTC.computePscc({
+  psccMode: 'manual', psccManualDays: '', sentencingDate: '2026-07-01'
+});
+eq(pmBad.errors.length > 0, true, 'manual pscc rejects blank days');
+
 /* --- DOC: 5 years, arrested Jan 1, sentenced Jul 1 2026 (user example) --- */
 
 var input = {
@@ -70,6 +89,23 @@ eq(GTC.toISO(d.pedFullEtMs), '2027-11-16', 'doc PED full earned time');
 var r12 = GTC.calculate(Object.assign({}, input, { etRate: 12 }));
 // floor(1826*12/42) = 521 <= cap 547
 eq(r12.doc.etFullDays, 521, 'doc 12/mo full earned time days');
+
+/* --- DOC 14 days/month (SB26-159): 30% cap binds --- */
+var r14 = GTC.calculate(Object.assign({}, input, { etRate: 14 }));
+// floor(1826*14/44) = 581 > cap 547, so the 30% cap binds
+eq(r14.doc.etRate, 14, 'doc 14/mo rate accepted');
+eq(r14.doc.etFullDays, 547, 'doc 14/mo earned time hits 30% cap');
+eq(GTC.toISO(r14.doc.mrdFullMs),
+  GTC.toISO(GTC.addDays(r14.doc.startMs, 1826 - 547)), 'doc 14/mo MRD from capped ET');
+eq(r14.doc.pedFullEtMs < r12.doc.pedFullEtMs, true, 'doc 14/mo PED earlier than 12/mo');
+
+/* --- Manual PSCC feeds the same DOC math as computed dates --- */
+var rManual = GTC.calculate({
+  psccMode: 'manual', psccManualDays: '182', sentencingDate: '2026-07-01',
+  years: 5, months: 0, days: 0, type: 'doc', etRate: 10, parolePct: 50
+});
+eq(GTC.toISO(rManual.doc.sddMs), GTC.toISO(d.sddMs), 'manual 182 days matches dates mode SDD');
+eq(GTC.toISO(rManual.doc.mrdFullMs), GTC.toISO(d.mrdFullMs), 'manual 182 days matches dates mode MRD');
 
 /* --- DOC 85% (Prop 128): no earned-time reduction of the floor --- */
 var r85 = GTC.calculate(Object.assign({}, input, { parolePct: 85 }));
