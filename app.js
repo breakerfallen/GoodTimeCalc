@@ -82,13 +82,11 @@
         (input.custodyEnd === 'bond' ? 'bond-out' : 'sentencing') + ', inclusive',
       'hero');
     html += row('Sentence', GTC.termToString(result.term) +
-      (result.type === 'jail' ? ' county jail' : ' DOC'), null);
+      (result.type === 'jail' ? ' county jail' : ' DOC'),
+      'all dates below already include the PSCC credit');
 
     if (result.type === 'jail') {
       var j = result.jail;
-      html += row('Effective sentence start', GTC.fmtDate(j.startMs),
-        'sentence clock starts ' + p.totalDays + ' days before sentencing (PSCC) · ' +
-        j.sentenceDays + '-day sentence');
       j.scenarios.forEach(function (sc) {
         html += row('Release — ' + esc(sc.label),
           GTC.fmtDate(sc.releaseMs) + (sc.alreadyServed ? '<span class="badge">time served</span>' : ''),
@@ -97,17 +95,24 @@
       });
     } else {
       var d = result.doc;
-      html += row('Earned time', d.etRate + ' days/month',
-        'cap ' + d.etCapDays + ' days (30% of sentence)');
-      html += row('Parole eligibility rule', esc(GTC.PAROLE_LABELS[d.parolePct]));
-      html += row('Effective sentence start', GTC.fmtDate(d.startMs),
-        'DOC deems the sentence to begin ' + p.totalDays + ' days before sentencing (PSCC) · ' +
-        d.sentenceDays + '-day sentence');
-      html += row('Parole eligibility — no earned time', GTC.fmtDate(d.pedNoEtMs));
-      html += row('Parole eligibility — full earned time', GTC.fmtDate(d.pedFullEtMs), null, 'hero');
-      html += row('Mandatory release (MRD) — full earned time', GTC.fmtDate(d.mrdFullMs),
-        d.etFullDays + ' days earned time', 'hero');
-      html += row('Sentence discharge — no earned/good time', GTC.fmtDate(d.sddMs));
+      if (d.parolePct === 100) {
+        html += row('Release — full sentence must be served', GTC.fmtDate(d.sddMs),
+          'earned time does not apply', 'hero');
+      } else if (d.parolePct === 85) {
+        html += row('Parole eligibility — 85% floor', GTC.fmtDate(d.pedNoEtMs),
+          'earned time cannot move this date', 'hero');
+        html += row('Mandatory release (MRD)', GTC.fmtDate(d.mrdFullMs),
+          d.mrdClamped ? 'held to the 85% floor' :
+            'with max earned time (' + d.etFullDays + ' days)', 'hero');
+        html += row('Sentence discharge — if no earned time', GTC.fmtDate(d.sddMs));
+      } else {
+        html += row('Parole eligibility — if no earned time', GTC.fmtDate(d.pedNoEtMs));
+        html += row('Parole eligibility — with max earned time', GTC.fmtDate(d.pedFullEtMs),
+          null, 'hero');
+        html += row('Mandatory release (MRD) — with max earned time', GTC.fmtDate(d.mrdFullMs),
+          d.etFullDays + ' days earned at ' + d.etRate + '/mo', 'hero');
+        html += row('Sentence discharge — if no earned time', GTC.fmtDate(d.sddMs));
+      }
     }
     html += '</dl>';
     $('results-body').innerHTML = html;

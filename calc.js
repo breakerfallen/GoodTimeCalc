@@ -141,10 +141,15 @@ var GTC = (function () {
     var mrdFull = addDays(start, S - etFull);
 
     var f = { 50: 0.50, 75: 0.75, 85: 0.85, 100: 1.00 }[opts.parolePct] || 0.50;
-    var pedNoEt, pedFullEt;
+    var pedNoEt, pedFullEt, mrdClamped = false;
     if (opts.parolePct === 85 || opts.parolePct === 100) {
       pedNoEt = addDays(start, Math.ceil(S * f));
       pedFullEt = pedNoEt; // earned time may not reduce the 85%/100% floor
+      if (mrdFull < pedNoEt) { // release cannot precede the Prop 128 floor
+        mrdFull = pedNoEt;
+        etFull = daysBetween(mrdFull, sdd);
+        mrdClamped = true;
+      }
     } else {
       pedNoEt = addDays(start, Math.ceil(S * f));
       var servedPed = Math.ceil(S * f * 30 / (30 + r));
@@ -161,6 +166,7 @@ var GTC = (function () {
       etFullDays: etFull,
       sddMs: sdd,
       mrdFullMs: mrdFull,
+      mrdClamped: mrdClamped,
       pedNoEtMs: pedNoEt,
       pedFullEtMs: pedFullEt,
       parolePct: opts.parolePct
@@ -267,10 +273,8 @@ var GTC = (function () {
     if (result.type === 'jail') {
       var j = result.jail;
       L.push('Sentence: ' + termToString(result.term) + ' county jail (' + j.sentenceDays + ' days)');
-      L.push('Effective sentence start: ' + fmtShort(j.startMs) +
-        ' (sentencing date minus ' + p.totalDays + ' days PSCC)');
       L.push('');
-      L.push('Estimated release dates (C.R.S. 17-26-109):');
+      L.push('Estimated release dates (PSCC already applied; C.R.S. 17-26-109):');
       j.scenarios.forEach(function (sc) {
         L.push('  ' + sc.label + ': ' + fmtShort(sc.releaseMs) +
           (sc.deductionDays ? ' (' + sc.deductionDays + ' days good time)' : '') +
@@ -279,15 +283,26 @@ var GTC = (function () {
     } else {
       var d = result.doc;
       L.push('Sentence: ' + termToString(result.term) + ' DOC (' + d.sentenceDays + ' days)');
-      L.push('Earned time rate: ' + d.etRate + ' days/month (cap ' + d.etCapDays + ' days)');
-      L.push('Parole eligibility: ' + PAROLE_LABELS[d.parolePct]);
-      L.push('Effective sentence start: ' + fmtShort(d.startMs) +
-        ' (sentencing date minus ' + p.totalDays + ' days PSCC)');
+      L.push('Parole eligibility rule: ' + PAROLE_LABELS[d.parolePct]);
       L.push('');
-      L.push('Parole eligibility (no earned time): ' + fmtShort(d.pedNoEtMs));
-      L.push('Parole eligibility (full earned time): ' + fmtShort(d.pedFullEtMs));
-      L.push('Mandatory release (full earned time, ' + d.etFullDays + ' days ET): ' + fmtShort(d.mrdFullMs));
-      L.push('Sentence discharge (no earned time): ' + fmtShort(d.sddMs));
+      L.push('Estimated dates (PSCC already applied):');
+      if (d.parolePct === 100) {
+        L.push('  Release: ' + fmtShort(d.sddMs) +
+          ' — full sentence must be served; earned time does not apply');
+      } else if (d.parolePct === 85) {
+        L.push('  Parole eligibility (85% floor): ' + fmtShort(d.pedNoEtMs) +
+          ' — earned time cannot move this date');
+        L.push('  Mandatory release: ' + fmtShort(d.mrdFullMs) +
+          (d.mrdClamped ? ' — held to the 85% floor' :
+            ' (max earned time, ' + d.etFullDays + ' days)'));
+        L.push('  Sentence discharge, if no earned time: ' + fmtShort(d.sddMs));
+      } else {
+        L.push('  Parole eligibility, if no earned time: ' + fmtShort(d.pedNoEtMs));
+        L.push('  Parole eligibility, with max earned time: ' + fmtShort(d.pedFullEtMs));
+        L.push('  Mandatory release, with max earned time (' + d.etFullDays + ' days at ' +
+          d.etRate + '/mo): ' + fmtShort(d.mrdFullMs));
+        L.push('  Sentence discharge, if no earned time: ' + fmtShort(d.sddMs));
+      }
     }
     L.push('');
     L.push(DISCLAIMER);
