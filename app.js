@@ -35,7 +35,7 @@
       months: $('sent-months').value,
       days: $('sent-days').value,
       type: radioValue('type'),
-      etRate: radioValue('etRate'),
+      etRate: $('et-rate').value,
       parolePct: $('parole-pct').value
     };
   }
@@ -54,7 +54,7 @@
     $('sent-months').value = input.months || 0;
     $('sent-days').value = input.days || 0;
     setRadio('type', input.type || 'doc');
-    setRadio('etRate', input.etRate || '10');
+    $('et-rate').value = String(input.etRate || '14');
     $('parole-pct').value = input.parolePct || '50';
     syncVisibility();
   }
@@ -86,7 +86,8 @@
     var html = '<dl>';
     html += row('PSCC as of sentencing (' + GTC.fmtShort(p.sentencingMs) + ')',
       p.totalDays + ' days',
-      p.manual ? 'entered directly' + (p.assumedToday ? ' · sentencing date assumed today' : '') :
+      p.manual ? 'entered directly' + (p.assumedToday ?
+        ' · no date entered — calculated as of ' + GTC.fmtShort(p.sentencingMs) : '') :
         (p.extraDays ? p.baseDays + ' counted + ' + p.extraDays + ' additional' :
           'day of arrest through ' +
           (input.custodyEnd === 'bond' ? 'bond-out' : 'sentencing') + ', inclusive'),

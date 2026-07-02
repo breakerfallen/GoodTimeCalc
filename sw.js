@@ -1,7 +1,7 @@
 /* GoodTimeCalc service worker — precache app shell, cache-first with network fallback. */
 'use strict';
 
-var CACHE = 'gtc-v5';
+var CACHE = 'gtc-v6';
 var ASSETS = [
   './',
   './index.html',

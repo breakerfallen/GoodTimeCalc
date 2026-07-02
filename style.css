@@ -139,6 +139,14 @@ button.copied { background: var(--good); color: #fff; border-color: var(--good);
 
 .disclaimer { font-size: 0.78rem; color: var(--muted); margin: 12px 0 0; }
 .help { font-size: 0.78rem; margin: 8px 0 0; }
+details.info { margin-top: 12px; font-size: 0.82rem; color: var(--muted); }
+details.info summary {
+  cursor: pointer; color: var(--accent); font-weight: 600;
+  list-style-position: inside;
+}
+details.info summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details.info p { margin: 8px 0 0; }
+
 .date-row { display: flex; gap: 8px; }
 .date-row input { flex: 1; min-width: 0; }
 .date-row button { white-space: nowrap; }

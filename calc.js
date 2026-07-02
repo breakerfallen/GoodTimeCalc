@@ -300,7 +300,7 @@ var GTC = (function () {
     L.push('');
     if (p.manual) {
       L.push('Sentencing date: ' + fmtShort(p.sentencingMs) +
-        (p.assumedToday ? ' (none entered — assumed today)' : ''));
+        (p.assumedToday ? ' (not entered — calculated as of this date)' : ''));
       L.push('PSCC as of sentencing: ' + p.totalDays + ' days (entered directly)');
     } else {
       L.push('Arrest date: ' + fmtShort(p.arrestMs));
