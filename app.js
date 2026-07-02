@@ -63,6 +63,7 @@
     var manualPscc = radioValue('psccMode') === 'manual';
     $('pscc-dates').hidden = manualPscc;
     $('pscc-manual').hidden = !manualPscc;
+    $('sent-date-hint').hidden = !manualPscc;
     $('bond-row').hidden = radioValue('custodyEnd') !== 'bond';
     $('doc-options').hidden = radioValue('type') !== 'doc';
   }
@@ -85,7 +86,7 @@
     var html = '<dl>';
     html += row('PSCC as of sentencing (' + GTC.fmtShort(p.sentencingMs) + ')',
       p.totalDays + ' days',
-      p.manual ? 'entered directly' :
+      p.manual ? 'entered directly' + (p.assumedToday ? ' · sentencing date assumed today' : '') :
         (p.extraDays ? p.baseDays + ' counted + ' + p.extraDays + ' additional' :
           'day of arrest through ' +
           (input.custodyEnd === 'bond' ? 'bond-out' : 'sentencing') + ', inclusive'),
@@ -238,6 +239,13 @@
     .forEach(function (el) {
       el.addEventListener('change', syncVisibility);
     });
+
+  $('today-btn').addEventListener('click', function () {
+    var d = new Date();
+    var m = String(d.getMonth() + 1), day = String(d.getDate());
+    $('sentencing-date').value = d.getFullYear() + '-' +
+      (m.length < 2 ? '0' : '') + m + '-' + (day.length < 2 ? '0' : '') + day;
+  });
 
   $('copy-btn').addEventListener('click', function () {
     if (lastExportText) copyText(lastExportText, this);

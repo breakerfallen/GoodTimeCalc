@@ -85,7 +85,12 @@ var GTC = (function () {
   function computePscc(input) {
     if (input.psccMode === 'manual') {
       var sentencingM = parseDate(input.sentencingDate);
-      if (sentencingM === null) return { errors: ['Enter a valid sentencing date.'] };
+      var assumedToday = false;
+      if (sentencingM === null) { // optional in manual mode; default to today
+        var now = new Date();
+        sentencingM = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        assumedToday = true;
+      }
       var raw = input.psccManualDays;
       if (raw === '' || raw === null || raw === undefined) {
         return { errors: ['Enter the PSCC days (0 or more).'] };
@@ -95,6 +100,7 @@ var GTC = (function () {
       return {
         errors: [],
         manual: true,
+        assumedToday: assumedToday,
         sentencingMs: sentencingM,
         baseDays: manual,
         extraDays: 0,
@@ -234,7 +240,7 @@ var GTC = (function () {
   }
 
   var ET_LABELS = {
-    10: '10 days/month (standard)',
+    10: '10 days/month (F1–F3, DF1–DF2)',
     12: '12 days/month (F4–F6, DF3–DF4 — SB26-159 excluded offense)',
     14: '14 days/month (F4–F6, DF3–DF4 — SB26-159)'
   };
@@ -293,7 +299,8 @@ var GTC = (function () {
     if (input.notes) L.push('Notes: ' + input.notes);
     L.push('');
     if (p.manual) {
-      L.push('Sentencing date: ' + fmtShort(p.sentencingMs));
+      L.push('Sentencing date: ' + fmtShort(p.sentencingMs) +
+        (p.assumedToday ? ' (none entered — assumed today)' : ''));
       L.push('PSCC as of sentencing: ' + p.totalDays + ' days (entered directly)');
     } else {
       L.push('Arrest date: ' + fmtShort(p.arrestMs));

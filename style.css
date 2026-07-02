@@ -139,6 +139,9 @@ button.copied { background: var(--good); color: #fff; border-color: var(--good);
 
 .disclaimer { font-size: 0.78rem; color: var(--muted); margin: 12px 0 0; }
 .help { font-size: 0.78rem; margin: 8px 0 0; }
+.date-row { display: flex; gap: 8px; }
+.date-row input { flex: 1; min-width: 0; }
+.date-row button { white-space: nowrap; }
 .muted { color: var(--muted); font-size: 0.88rem; }
 
 .history { list-style: none; margin: 0; padding: 0; }

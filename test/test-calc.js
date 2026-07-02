@@ -59,6 +59,22 @@ var pmBad = GTC.computePscc({
 });
 eq(pmBad.errors.length > 0, true, 'manual pscc rejects blank days');
 
+var pmNoDate = GTC.computePscc({
+  psccMode: 'manual', psccManualDays: '90', sentencingDate: ''
+});
+eq(pmNoDate.errors.length, 0, 'manual pscc allows blank sentencing date');
+eq(pmNoDate.assumedToday, true, 'manual pscc flags assumed-today date');
+var todayLocal = (function () {
+  var d = new Date();
+  return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+})();
+eq(pmNoDate.sentencingMs, todayLocal, 'manual pscc assumed date is today');
+
+var pDatesNoDate = GTC.computePscc({
+  arrestDate: '2026-01-01', custodyEnd: 'sentencing', sentencingDate: '', extraPsccDays: 0
+});
+eq(pDatesNoDate.errors.length > 0, true, 'dates mode still requires sentencing date');
+
 /* --- DOC: 5 years, arrested Jan 1, sentenced Jul 1 2026 (user example) --- */
 
 var input = {

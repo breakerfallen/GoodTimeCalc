@@ -67,8 +67,12 @@
                  placeholder="e.g., 182">
         </div>
 
-        <label for="sentencing-date">Sentencing date</label>
-        <input type="date" id="sentencing-date" required>
+        <label for="sentencing-date">Sentencing date
+          <span id="sent-date-hint" hidden>— optional here; today is assumed if blank</span></label>
+        <div class="date-row">
+          <input type="date" id="sentencing-date">
+          <button type="button" id="today-btn">Today</button>
+        </div>
       </section>
 
       <section class="card">
@@ -92,17 +96,18 @@
           <fieldset class="segmented">
             <legend>Earned time rate (C.R.S. 17-22.5-405)</legend>
             <label><input type="radio" name="etRate" value="10" checked>
-              <span>10/mo — standard</span></label>
+              <span>10/mo — F1–F3, DF1–DF2</span></label>
             <label><input type="radio" name="etRate" value="14">
               <span>14/mo — F4–F6, DF3–DF4 (SB26-159)</span></label>
             <label><input type="radio" name="etRate" value="12">
               <span>12/mo — SB26-159 excluded offense</span></label>
           </fieldset>
-          <p class="muted help" id="sb26-note">SB26-159 (2026) raises earned time for class 4–6
-            felonies and level 3–4 drug felonies from 12 to 14 days/month, <strong>except</strong>
-            felony motor vehicle theft; C.R.S. 18-3-303, 18-3-305, 18-3-306; 18-6-701;
-            18-7-402 to 18-7-407; 18-12-102; 18-12-109; and felony victim-rights crimes listed
-            in 24-4.1-302 — those stay at 12.</p>
+          <p class="muted help" id="sb26-note">10 days/month applies to class 1–3 felonies and
+            level 1–2 drug felonies. SB26-159 (2026) raises class 4–6 felonies and level 3–4
+            drug felonies from 12 to 14 days/month, <strong>except</strong> felony motor vehicle
+            theft; C.R.S. 18-3-303, 18-3-305, 18-3-306; 18-6-701; 18-7-402 to 18-7-407;
+            18-12-102; 18-12-109; and felony victim-rights crimes listed in 24-4.1-302 —
+            those stay at 12.</p>
 
           <label for="parole-pct">Parole eligibility (C.R.S. 17-22.5-403)</label>
           <select id="parole-pct">
