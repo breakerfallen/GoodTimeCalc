@@ -86,8 +86,9 @@
 
     if (result.type === 'jail') {
       var j = result.jail;
-      html += row('Time comp start (backdated by PSCC)', GTC.fmtDate(j.startMs),
-        j.sentenceDays + ' sentence days');
+      html += row('Effective sentence start', GTC.fmtDate(j.startMs),
+        'sentence clock starts ' + p.totalDays + ' days before sentencing (PSCC) · ' +
+        j.sentenceDays + '-day sentence');
       j.scenarios.forEach(function (sc) {
         html += row('Release — ' + esc(sc.label),
           GTC.fmtDate(sc.releaseMs) + (sc.alreadyServed ? '<span class="badge">time served</span>' : ''),
@@ -99,8 +100,9 @@
       html += row('Earned time', d.etRate + ' days/month',
         'cap ' + d.etCapDays + ' days (30% of sentence)');
       html += row('Parole eligibility rule', esc(GTC.PAROLE_LABELS[d.parolePct]));
-      html += row('Time comp start (backdated by PSCC)', GTC.fmtDate(d.startMs),
-        d.sentenceDays + ' sentence days');
+      html += row('Effective sentence start', GTC.fmtDate(d.startMs),
+        'DOC deems the sentence to begin ' + p.totalDays + ' days before sentencing (PSCC) · ' +
+        d.sentenceDays + '-day sentence');
       html += row('Parole eligibility — no earned time', GTC.fmtDate(d.pedNoEtMs));
       html += row('Parole eligibility — full earned time', GTC.fmtDate(d.pedFullEtMs), null, 'hero');
       html += row('Mandatory release (MRD) — full earned time', GTC.fmtDate(d.mrdFullMs),

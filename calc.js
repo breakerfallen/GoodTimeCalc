@@ -267,7 +267,8 @@ var GTC = (function () {
     if (result.type === 'jail') {
       var j = result.jail;
       L.push('Sentence: ' + termToString(result.term) + ' county jail (' + j.sentenceDays + ' days)');
-      L.push('Time comp start (backdated by PSCC): ' + fmtShort(j.startMs));
+      L.push('Effective sentence start: ' + fmtShort(j.startMs) +
+        ' (sentencing date minus ' + p.totalDays + ' days PSCC)');
       L.push('');
       L.push('Estimated release dates (C.R.S. 17-26-109):');
       j.scenarios.forEach(function (sc) {
@@ -280,7 +281,8 @@ var GTC = (function () {
       L.push('Sentence: ' + termToString(result.term) + ' DOC (' + d.sentenceDays + ' days)');
       L.push('Earned time rate: ' + d.etRate + ' days/month (cap ' + d.etCapDays + ' days)');
       L.push('Parole eligibility: ' + PAROLE_LABELS[d.parolePct]);
-      L.push('Time comp start (backdated by PSCC): ' + fmtShort(d.startMs));
+      L.push('Effective sentence start: ' + fmtShort(d.startMs) +
+        ' (sentencing date minus ' + p.totalDays + ' days PSCC)');
       L.push('');
       L.push('Parole eligibility (no earned time): ' + fmtShort(d.pedNoEtMs));
       L.push('Parole eligibility (full earned time): ' + fmtShort(d.pedFullEtMs));
