@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>GoodTimeCalc</title>
+  <meta name="description" content="Colorado presentence confinement credit, earned time, and good time estimator for jail and DOC sentences.">
+  <meta name="theme-color" content="#1e3a5f">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GoodTimeCalc">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>GoodTimeCalc</h1>
+    <p class="tagline">Colorado PSCC &amp; earned/good time estimator</p>
+  </header>
+
+  <main>
+    <form id="calc-form" autocomplete="off">
+      <section class="card">
+        <h2>Case</h2>
+        <label for="title">Title (client / plea option)</label>
+        <input type="text" id="title" placeholder="e.g., Smith — 5yr DOC offer">
+        <label for="notes">Notes</label>
+        <textarea id="notes" rows="2" placeholder="Plea terms, counts, comparison notes…"></textarea>
+      </section>
+
+      <section class="card">
+        <h2>Custody &amp; sentencing</h2>
+        <label for="arrest-date">Date of arrest / custody start</label>
+        <input type="date" id="arrest-date" required>
+
+        <fieldset class="segmented" id="custody-end">
+          <legend>Custody status before sentencing</legend>
+          <label><input type="radio" name="custodyEnd" value="sentencing" checked>
+            <span>In custody through sentencing</span></label>
+          <label><input type="radio" name="custodyEnd" value="bond">
+            <span>Bonded out</span></label>
+        </fieldset>
+
+        <div id="bond-row" hidden>
+          <label for="bond-date">Bond-out date</label>
+          <input type="date" id="bond-date">
+        </div>
+
+        <label for="sentencing-date">Sentencing date</label>
+        <input type="date" id="sentencing-date" required>
+
+        <label for="extra-pscc">Additional PSCC days (other custody periods)</label>
+        <input type="number" id="extra-pscc" min="0" step="1" value="0" inputmode="numeric">
+      </section>
+
+      <section class="card">
+        <h2>Sentence</h2>
+        <div class="term-row">
+          <div><label for="sent-years">Years</label>
+            <input type="number" id="sent-years" min="0" step="1" value="0" inputmode="numeric"></div>
+          <div><label for="sent-months">Months</label>
+            <input type="number" id="sent-months" min="0" step="1" value="0" inputmode="numeric"></div>
+          <div><label for="sent-days">Days</label>
+            <input type="number" id="sent-days" min="0" step="1" value="0" inputmode="numeric"></div>
+        </div>
+
+        <fieldset class="segmented" id="sent-type">
+          <legend>Sentence type</legend>
+          <label><input type="radio" name="type" value="doc" checked><span>DOC (prison)</span></label>
+          <label><input type="radio" name="type" value="jail"><span>County jail</span></label>
+        </fieldset>
+
+        <div id="doc-options">
+          <fieldset class="segmented">
+            <legend>Earned time rate (C.R.S. 17-22.5-405)</legend>
+            <label><input type="radio" name="etRate" value="10" checked>
+              <span>10 days/mo (standard)</span></label>
+            <label><input type="radio" name="etRate" value="12">
+              <span>12 days/mo (F4–F6, DF3–DF4)</span></label>
+          </fieldset>
+
+          <label for="parole-pct">Parole eligibility (C.R.S. 17-22.5-403)</label>
+          <select id="parole-pct">
+            <option value="50" selected>50% less earned time — most felonies</option>
+            <option value="75">75% less earned time — listed violent crimes (7/1/2004–12/31/2024)</option>
+            <option value="85">85%, no earned-time reduction — Prop 128 violent crimes (on/after 1/1/2025)</option>
+            <option value="100">100% — two prior crimes of violence (Prop 128)</option>
+          </select>
+        </div>
+      </section>
+
+      <div id="form-errors" class="errors" hidden></div>
+      <button type="submit" class="primary">Calculate</button>
+    </form>
+
+    <section id="results" class="card results" hidden>
+      <h2>Results</h2>
+      <div id="results-body"></div>
+      <div class="btn-row">
+        <button type="button" id="copy-btn">Copy all</button>
+        <button type="button" id="share-btn">Share</button>
+      </div>
+      <p class="disclaimer" id="disclaimer"></p>
+    </section>
+
+    <section class="card" id="history-card">
+      <h2>Recent calculations</h2>
+      <ul id="history-list" class="history"></ul>
+      <p class="muted" id="history-empty">No saved calculations yet. The last 10 are kept on this device.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p class="disclaimer">Estimates only — not legal advice. Actual dates are determined by the
+      court, CDOC time computation, or the county sheriff.</p>
+  </footer>
+
+  <script src="calc.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
