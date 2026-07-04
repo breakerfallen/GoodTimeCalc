@@ -106,16 +106,16 @@
       });
     } else {
       var d = result.doc;
-      if (d.parolePct === 100) {
-        html += row('Release — full sentence must be served', GTC.fmtDate(d.sddMs),
-          'earned time does not apply', 'hero');
-      } else if (d.parolePct === 85) {
-        html += row('Parole eligibility — 85% floor', GTC.fmtDate(d.pedNoEtMs),
-          'earned time cannot move this date', 'hero');
-        html += row('Mandatory release (MRD)', GTC.fmtDate(d.mrdFullMs),
-          d.mrdClamped ? 'held to the 85% floor' :
-            'with max earned time (' + d.etFullDays + ' days)', 'hero');
-        html += row('Sentence discharge — if no earned time', GTC.fmtDate(d.sddMs));
+      if (d.parolePct === 85 || d.parolePct === 100) {
+        html += row('Parole eligibility — ' +
+            (d.parolePct === 85 ? '85% floor' : 'full sentence (100%)'),
+          GTC.fmtDate(d.pedNoEtMs), 'earned time cannot move this date', 'hero');
+        html += row('Mandatory release (MRD) — with max earned time', GTC.fmtDate(d.mrdFullMs),
+          d.etFullDays + ' days earned at ' + d.etRate +
+          '/mo · release to parole supervision; may fall before the eligibility floor', 'hero');
+        if (d.parolePct === 85) {
+          html += row('Sentence discharge — if no earned time', GTC.fmtDate(d.sddMs));
+        }
       } else {
         html += row('Parole eligibility — if no earned time', GTC.fmtDate(d.pedNoEtMs));
         html += row('Parole eligibility — with max earned time', GTC.fmtDate(d.pedFullEtMs),
