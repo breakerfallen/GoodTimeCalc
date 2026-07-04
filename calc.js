@@ -168,15 +168,13 @@ var GTC = (function () {
     var mrdFull = addDays(start, S - etFull);
 
     var f = { 50: 0.50, 75: 0.75, 85: 0.85, 100: 1.00 }[opts.parolePct] || 0.50;
-    var pedNoEt, pedFullEt, mrdClamped = false;
+    var pedNoEt, pedFullEt;
     if (opts.parolePct === 85 || opts.parolePct === 100) {
+      // Earned time may not reduce the 85%/100% eligibility floor, but it
+      // still advances the MRD (C.R.S. 17-22.5-405), so the MRD is shown
+      // uncapped and may fall before the floor.
       pedNoEt = addDays(start, Math.ceil(S * f));
-      pedFullEt = pedNoEt; // earned time may not reduce the 85%/100% floor
-      if (mrdFull < pedNoEt) { // release cannot precede the Prop 128 floor
-        mrdFull = pedNoEt;
-        etFull = daysBetween(mrdFull, sdd);
-        mrdClamped = true;
-      }
+      pedFullEt = pedNoEt;
     } else {
       pedNoEt = addDays(start, Math.ceil(S * f));
       var servedPed = Math.ceil(S * f * 30 / (30 + r));
@@ -193,7 +191,6 @@ var GTC = (function () {
       etFullDays: etFull,
       sddMs: sdd,
       mrdFullMs: mrdFull,
-      mrdClamped: mrdClamped,
       pedNoEtMs: pedNoEt,
       pedFullEtMs: pedFullEt,
       parolePct: opts.parolePct
@@ -241,8 +238,8 @@ var GTC = (function () {
 
   var ET_LABELS = {
     10: '10 days/month (F1–F3, DF1–DF2)',
-    12: '12 days/month (F4–F6, DF3–DF4 — SB26-159 excluded offense)',
-    14: '14 days/month (F4–F6, DF3–DF4 — SB26-159)'
+    12: '12 days/month (14-day tier with disqualifying current or prior conviction)',
+    14: '14 days/month (F4–F6, DF3–DF4)'
   };
 
   // Offenses excluded from SB26-159's 14-day rate (remain at 12 days/month)
@@ -252,10 +249,10 @@ var GTC = (function () {
     '18-12-109; and felony victim-rights crimes listed in 24-4.1-302, which stay at 12.';
 
   var PAROLE_LABELS = {
-    50: '50% less earned time (most felonies)',
-    75: '75% less earned time (listed violent crimes 7/1/2004–12/31/2024)',
-    85: '85%, no earned-time reduction (Prop 128 violent crimes on/after 1/1/2025)',
-    100: '100% (two prior crime-of-violence convictions, Prop 128)'
+    50: '50% less earned time — most felonies (C.R.S. 17-22.5-403(1))',
+    75: '75% less earned time — listed violent crimes 7/1/2004–12/31/2024 (C.R.S. 17-22.5-403(2.5))',
+    85: '85%, no earned-time reduction — listed violent crimes on/after 1/1/2025 (C.R.S. 17-22.5-303.3(1.5))',
+    100: '100% — two prior crime-of-violence convictions (C.R.S. 17-22.5-303.3(2.5))'
   };
 
   function calculate(input) {
@@ -288,9 +285,11 @@ var GTC = (function () {
     return result;
   }
 
-  var DISCLAIMER = 'Estimates only, based on C.R.S. 18-1.3-405, 17-22.5-403/-405, and ' +
-    '17-26-109. Actual dates are set by the court, DOC time computation, or the sheriff ' +
-    'and depend on facts not modeled here. Not legal advice.';
+  var DISCLAIMER = 'Not included in this estimate: achievement earned time ' +
+    '(C.R.S. 17-22.5-405(9)) and credential/education earned time (17-22.5-405(3.7)) — ' +
+    'uncapped credits outside the 30% ceiling that can move these dates earlier, except in ' +
+    'tiers that allow no earned-time reduction. Also not modeled: consecutive sentences, ' +
+    'earned-time forfeitures, and parole-period recalculations.';
 
   function buildExportText(input, result) {
     var L = [];
@@ -332,16 +331,15 @@ var GTC = (function () {
       L.push('Parole eligibility rule: ' + PAROLE_LABELS[d.parolePct]);
       L.push('');
       L.push('Estimated dates (PSCC already applied):');
-      if (d.parolePct === 100) {
-        L.push('  Release: ' + fmtShort(d.sddMs) +
-          ' — full sentence must be served; earned time does not apply');
-      } else if (d.parolePct === 85) {
-        L.push('  Parole eligibility (85% floor): ' + fmtShort(d.pedNoEtMs) +
-          ' — earned time cannot move this date');
-        L.push('  Mandatory release: ' + fmtShort(d.mrdFullMs) +
-          (d.mrdClamped ? ' — held to the 85% floor' :
-            ' (max earned time, ' + d.etFullDays + ' days)'));
-        L.push('  Sentence discharge, if no earned time: ' + fmtShort(d.sddMs));
+      if (d.parolePct === 85 || d.parolePct === 100) {
+        L.push('  Parole eligibility (' + (d.parolePct === 85 ? '85% floor' : 'full sentence') +
+          '): ' + fmtShort(d.pedNoEtMs) + ' — earned time cannot move this date');
+        L.push('  Mandatory release, with max earned time (' + d.etFullDays + ' days at ' +
+          d.etRate + '/mo): ' + fmtShort(d.mrdFullMs) +
+          ' — release to parole supervision; may fall before the eligibility floor');
+        if (d.parolePct === 85) {
+          L.push('  Sentence discharge, if no earned time: ' + fmtShort(d.sddMs));
+        }
       } else {
         L.push('  Parole eligibility, if no earned time: ' + fmtShort(d.pedNoEtMs));
         L.push('  Parole eligibility, with max earned time: ' + fmtShort(d.pedFullEtMs));

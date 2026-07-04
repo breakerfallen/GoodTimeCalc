@@ -128,14 +128,13 @@ var r85 = GTC.calculate(Object.assign({}, input, { parolePct: 85 }));
 eq(GTC.toISO(r85.doc.pedNoEtMs), GTC.toISO(r85.doc.pedFullEtMs), 'doc 85% PED ignores earned time');
 // ceil(0.85*1826) = 1553 days from 2025-12-31 -> 2030-04-02
 eq(GTC.toISO(r85.doc.pedNoEtMs), '2030-04-02', 'doc 85% PED date');
-// earned-time MRD (2029-10-01) would precede the floor, so it is clamped
-eq(r85.doc.mrdClamped, true, 'doc 85% MRD clamped to floor');
-eq(GTC.toISO(r85.doc.mrdFullMs), '2030-04-02', 'doc 85% MRD = 85% floor');
+// earned time still advances the MRD (shown alongside the floor, not clamped)
+eq(GTC.toISO(r85.doc.mrdFullMs), '2029-10-01', 'doc 85% MRD keeps earned time');
 
-/* --- DOC 100%: PED equals discharge, MRD clamped to full sentence --- */
+/* --- DOC 100%: PED equals discharge; MRD still shows earned time --- */
 var r100 = GTC.calculate(Object.assign({}, input, { parolePct: 100 }));
 eq(GTC.toISO(r100.doc.pedNoEtMs), '2030-12-31', 'doc 100% PED = SDD');
-eq(GTC.toISO(r100.doc.mrdFullMs), '2030-12-31', 'doc 100% MRD = SDD');
+eq(GTC.toISO(r100.doc.mrdFullMs), '2029-10-01', 'doc 100% MRD keeps earned time');
 
 /* --- Jail: 90 days, 10 days PSCC --- */
 var jr = GTC.calculate({
@@ -169,7 +168,7 @@ eq(jts.jail.scenarios.every(function (s) { return s.alreadyServed; }), true,
 /* --- Export text sanity --- */
 var text = GTC.buildExportText(input, r);
 eq(text.indexOf('PSCC as of sentencing: 182 days') >= 0, true, 'export includes PSCC');
-eq(text.indexOf('Not legal advice') >= 0, true, 'export includes disclaimer');
+eq(text.indexOf('achievement earned time') >= 0, true, 'export includes coverage note');
 
 if (failures) {
   console.error('\n' + failures + ' test(s) failed');

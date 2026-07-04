@@ -95,31 +95,70 @@
         <div id="doc-options">
           <label for="et-rate">Earned time rate (C.R.S. 17-22.5-405)</label>
           <select id="et-rate">
-            <option value="14" selected>14 days/mo — F4–F6, DF3–DF4 (SB26-159)</option>
-            <option value="12">12 days/mo — SB26-159 excluded offense</option>
+            <option value="14" selected>14 days/mo — F4–F6, DF3–DF4</option>
+            <option value="12">12 days/mo — 14-day tier w/ disqualifying current or prior conviction</option>
             <option value="10">10 days/mo — F1–F3, DF1–DF2</option>
           </select>
 
           <label for="parole-pct">Parole eligibility (C.R.S. 17-22.5-403)</label>
           <select id="parole-pct">
-            <option value="50" selected>50% less earned time — most felonies</option>
-            <option value="75">75% less earned time — listed violent crimes (7/1/2004–12/31/2024)</option>
-            <option value="85">85%, no earned-time reduction — Prop 128 violent crimes (on/after 1/1/2025)</option>
-            <option value="100">100% — two prior crimes of violence (Prop 128)</option>
+            <option value="50" selected>50% less earned time — most felonies (17-22.5-403(1))</option>
+            <option value="75">75% less earned time — listed violent crimes 7/1/2004–12/31/2024 (403(2.5))</option>
+            <option value="85">85%, no earned-time reduction — listed violent crimes on/after 1/1/2025 (303.3(1.5))</option>
+            <option value="100">100% — two prior crimes of violence (303.3(2.5))</option>
           </select>
 
           <details class="info">
-            <summary>Which options apply?</summary>
-            <p><strong>Earned time.</strong> 10 days/month applies to class 1–3 felonies and
-              level 1–2 drug felonies. SB26-159 (2026) raises class 4–6 felonies and level 3–4
-              drug felonies from 12 to 14 days/month, <strong>except</strong> felony motor
-              vehicle theft; C.R.S. 18-3-303, 18-3-305, 18-3-306; 18-6-701; 18-7-402 to
-              18-7-407; 18-12-102; 18-12-109; and felony victim-rights crimes listed in
-              24-4.1-302 — those earn 12. Total earned time may not exceed 30% of the sentence.</p>
-            <p><strong>Parole eligibility.</strong> Most felonies: 50% of the sentence less
-              earned time. Listed crimes of violence committed 7/1/2004–12/31/2024: 75% less
-              earned time. Prop 128 crimes of violence committed on/after 1/1/2025: 85% with
-              no earned-time reduction — or 100% with two prior crime-of-violence convictions.</p>
+            <summary>Colorado earned time &amp; parole eligibility</summary>
+            <h3>Earned time</h3>
+            <p>Earned time reduces a sentence at a fixed monthly rate and may never reduce a
+              sentence by more than 30% total (C.R.S. 17-22.5-405(4)(a)). The monthly rate
+              depends on the offense:</p>
+            <ul>
+              <li><strong>10 days/month</strong> — class 1–3 felonies; level 1–2 drug felonies.</li>
+              <li><strong>14 days/month</strong> — class 4–6 felonies; level 3–4 drug felonies.</li>
+              <li><strong>12 days/month</strong> — offenders otherwise in the 14-day tier, if
+                they have a current or prior conviction for felony motor vehicle theft; a
+                victim-rights felony under C.R.S. 24-4.1-302(1); or an offense under C.R.S.
+                18-3-303, 18-3-305, 18-3-306, 18-6-701, 18-7-402 through 18-7-407, 18-12-102,
+                or 18-12-109.</li>
+            </ul>
+            <p>Two additional, uncapped categories sit outside the 30% ceiling: achievement
+              earned time (C.R.S. 17-22.5-405(9)) for program milestones and exceptional
+              conduct, and credential/education earned time (C.R.S. 17-22.5-405(3.7)) for
+              degrees earned by nonviolent offenders.</p>
+            <h3>Parole eligibility</h3>
+            <p>Eligibility is a percentage of the imposed sentence. Whether earned time
+              advances that date depends on the tier.</p>
+            <ul>
+              <li><strong>50%, less earned time</strong> — class 2–6 felonies, level 1–4 drug
+                felonies, and unclassified felonies (C.R.S. 17-22.5-403(1)). Class 1 felonies
+                are not parole-eligible.</li>
+              <li><strong>75%, less earned time</strong> — second degree murder, first degree
+                assault, first degree kidnapping (unless class 1), first degree arson, first
+                degree burglary, or aggravated robbery, committed 7/1/2004–12/31/2024
+                (C.R.S. 17-22.5-403(2.5)). Applies only to the class 2 or 3 versions of these
+                crimes, or the class 4 or 5 versions where the person has a prior crime of
+                violence.</li>
+              <li><strong>85%, no earned-time reduction</strong> — second degree murder, first
+                degree assault, class 2 felony kidnapping, sexual assault under part 4 of
+                article 3 of title 18, first degree arson, first degree burglary, or aggravated
+                robbery, committed on/after 1/1/2025 (C.R.S. 17-22.5-303.3(1.5)). With two
+                prior crime-of-violence convictions, the person serves the full sentence
+                before parole (C.R.S. 17-22.5-303.3(2.5)).</li>
+            </ul>
+            <h3>How credits apply</h3>
+            <ul>
+              <li>Regular earned time (405(1)/(1.5)) advances both the parole eligibility date
+                and the mandatory release date. It is capped at 30% and reduces the eligibility
+                date only in the 50% and 75% tiers — not the 85%/100% tier.</li>
+              <li>Achievement and credential earned time (405(9), (3.7)) are additional credits
+                exempt from the 30% cap. They do not apply to offenders in a tier that allows
+                no earned-time reduction.</li>
+              <li>Good time does not advance the parole eligibility date for felonies committed
+                on/after 7/1/1985; the 50% eligibility baseline replaced it. It factors into
+                the mandatory release date, not the eligibility date.</li>
+            </ul>
           </details>
         </div>
       </section>

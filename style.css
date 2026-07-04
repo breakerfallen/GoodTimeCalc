@@ -146,6 +146,9 @@ details.info summary {
 }
 details.info summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 details.info p { margin: 8px 0 0; }
+details.info h3 { margin: 12px 0 0; font-size: 0.85rem; color: var(--ink); }
+details.info ul { margin: 6px 0 0; padding-left: 18px; }
+details.info li { margin-top: 4px; }
 
 .date-row { display: flex; gap: 8px; }
 .date-row input { flex: 1; min-width: 0; }
